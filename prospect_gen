@@ -31,15 +31,16 @@ rounds = np.arange(args.maxround)
 
 for rround in rounds:
     TARGET_LIST=args.rootdir + '/prospects/{:d}/targetids.csv'.format(rround)
-    TILES='66003'
-    NIGHTS='20200315'
-    TITLEPAGE="speedz_notdating"
+    TILES='70512 70003 70502 70005 70500'
+    NIGHTS='20200219 20200220 20200226 20200227 20200228 20200303 20200304 20200314 20200315'
+    TITLEPAGE="speedz_notdating_round_{:d}".format(rround)
     SPECPROD_DIR="/global/cfs/cdirs/desi/spectro/redux/andes"
     WEB_DIR="/global/cfs/cdirs/desi/users/mjwilson/speedz_notdating/prospects/{:d}/".format(rround)
 
     Path(WEB_DIR).mkdir(parents=True, exist_ok=True)
-    
-    cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --tiles {} --nights {} --with_multiple_models --titlepage_prefix={}'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TILES, NIGHTS, TITLEPAGE)
+
+    # --tiles {} --nights {} TILES, NIGHTS
+    cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --with_multiple_models --titlepage_prefix={}'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TITLEPAGE)
 
     os.system(cmd)
 

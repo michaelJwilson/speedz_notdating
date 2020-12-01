@@ -8,7 +8,7 @@ import pandas as pd
 from   astropy.table import Table, join, vstack, Row
 
 
-root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/'
+root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/dryrun/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
@@ -42,8 +42,10 @@ print('Reducing {} for round {}'.format(entries_dir, rround))
 contestants = dict()
 
 for x in entries:
+    # desi-vi_speedz_notdating_1_MJW.csv
     author      = x.split('_')[-1].replace('.csv', '')
-
+    entry_num   = np.int(x.split('_')[-2])
+    
     # TARGETID EXPID NIGHT TILEID Spec_version Redrock_version Template_version Redrock_spectype Redrock_z VI_scanner VI_quality VI_issue VI_z VI_spectype VI_comment 
     entry       = pd.read_csv(x)
     entry       = entry.sort_values(by=['TARGETID'])
@@ -54,10 +56,16 @@ for x in entries:
     entry['TARGETID'] = np.array(entry['TARGETID'], dtype=np.int64)
     entry['VI_z'] = np.array(entry['VI_z'], dtype=np.float64)
     entry['VI_spectype'] = np.array(entry['VI_spectype'].data, dtype=np.str)
-        
+    entry['ENTRY_NUM'] = entry_num
+    
     if author not in contestants:
-        contestants[author] = {'entry': entry}
-        round_table         = vstack((round_table, entry)) # round_table.append(entry)
+        contestants[author] = {'entry_0': entry, 'all_entries': entry}
+
+    else:
+        contestants[author]['entry_{:d}'.format(entry_num)] = entry
+        contestants[author]['all_entries'.format(entry_num)] = vstack((contestants[author]['all_entries'.format(entry_num)], entry))
+            
+    round_table = vstack((round_table, entry)) # round_table.append(entry)
 
 print('\n\n')        
 print(contestants.keys())
@@ -70,7 +78,7 @@ toloop = list(contestants.keys())
 dz = 50. / 2.9979e5
 
 for author in toloop:
-    merge = join(contestants[author]['entry'], truth['TARGETID', 'best z', 'best quality', 'best spectype'], join_type='left', keys='TARGETID')
+    merge = join(contestants[author]['all_entries'], truth['TARGETID', 'best z', 'best quality', 'best spectype'], join_type='left', keys='TARGETID')
     
     contestants[author]['merged_entry'] = merge
 

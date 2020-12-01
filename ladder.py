@@ -22,7 +22,7 @@ matplotlib.rc('font', **font)
 
 score_types = ['howmany?!?', 'basics', 'notyourtype', 'lossofconfidence', 'aggorantmuch', 'round_score']
 
-root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/'
+root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/dryrun/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
