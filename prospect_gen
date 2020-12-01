@@ -41,8 +41,6 @@ for rround in rounds:
     
     cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --tiles {} --nights {} --with_multiple_models --titlepage_prefix={}'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TILES, NIGHTS, TITLEPAGE)
 
-    print(cmd)
+    os.system(cmd)
 
-    break
-
-print('\n\nGo to {}/specviewer_{}_1.html\n\n'.format(WEB_DIR.replace('/global/cfs/cdirs', 'https://data.desi.lbl.gov'), TITLEPAGE))    
+    print('\n\nGo to {}/specviewer_{}_1.html\n\n'.format(WEB_DIR.replace('/global/cfs/cdirs', 'https://data.desi.lbl.gov'), TITLEPAGE))    
