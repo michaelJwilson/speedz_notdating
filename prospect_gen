@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+###############
+### EA & MJW - 2020
+### Commands for the "speed-redshifting", DESI meeting dec 2020.
+###############
+
+##############
+# Demo: 
+# targetids from /global/cscratch1/sd/mjwilson/speedz_notdating/entries/0/desi-vi_BGS_reinspection_66003_1_HSH.csv
+import os
+import glob
+import argparse
+import numpy as np
+
+from   pathlib import Path
+from   astropy.io import ascii
+from   astropy.table import Table
+
+np.random.seed(42)
+
+root_dir=os.environ['CSCRATCH'] + '/speedz_notdating/'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--rootdir', default=root_dir, type=str)
+parser.add_argument('--maxround', type=int, default=2)
+
+args = parser.parse_args()
+
+rounds = np.arange(args.maxround)
+
+for rround in rounds:
+    TARGET_LIST=args.rootdir + '/prospects/{:d}/targetids.csv'.format(rround)
+    TILES='66003'
+    NIGHTS='20200315'
+    TITLEPAGE="speedz_notdating"
+    SPECPROD_DIR="/global/cfs/cdirs/desi/spectro/redux/andes"
+    WEB_DIR="/global/cfs/cdirs/desi/users/mjwilson/speedz_notdating/prospects/{:d}/".format(rround)
+
+    Path(WEB_DIR).mkdir(parents=True, exist_ok=True)
+    
+    cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --tiles {} --nights {} --with_multiple_models --titlepage_prefix={}'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TILES, NIGHTS, TITLEPAGE)
+
+    print(cmd)
+
+    break
+
+print('\n\nGo to {}/specviewer_{}_1.html\n\n'.format(WEB_DIR.replace('/global/cfs/cdirs', 'https://data.desi.lbl.gov'), TITLEPAGE))    

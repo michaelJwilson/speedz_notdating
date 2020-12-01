@@ -88,9 +88,9 @@ for author in toloop:
     scores['lossofconfidence'] = np.count_nonzero((merge['VI_quality'] < 2.5) & (merge['best quality'] >= 2.5))
         
     # Every low-quality case the user gives quality >= 2.5.
-    scores['aggorantmuch'] = np.count_nonzero((merge['VI_quality'] >= 2.5) & (merge['best quality'] < 2.5))
+    scores['arrogantmuch'] = np.count_nonzero((merge['VI_quality'] >= 2.5) & (merge['best quality'] < 2.5))
 
-    scores['roundscore']  = scores['howmany?!?'][0] - scores['notyourtype'][0] - scores['lossofconfidence'][0] - 2 * scores['basics'][0] - 2 * scores['aggorantmuch'][0]
+    scores['roundscore']  = scores['howmany?!?'][0] - scores['notyourtype'][0] - scores['lossofconfidence'][0] - 2 * scores['basics'][0] - 2 * scores['arrogantmuch'][0]
     scores['roundscore'] *= 5
     
     contestants[author]['score_breakdown'] = scores

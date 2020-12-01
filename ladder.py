@@ -14,11 +14,11 @@ from   astropy.table import Table
 
 plt.style.use('dark_background')
 
-fontpath = '/usr/share/fonts/truetype/batang.ttf'
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Tahoma']
 
-prop = font_manager.FontProperties(fname=fontpath)
-matplotlib.rcParams['font.family'] = prop.get_name()
-
+font = {'size': 30}
+matplotlib.rc('font', **font)
 
 score_types = ['howmany?!?', 'basics', 'notyourtype', 'lossofconfidence', 'aggorantmuch', 'round_score']
 
@@ -71,10 +71,7 @@ print('\n\n')
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-fig, ax = plt.subplots(1,1, figsize=(5,10))
-
-# back = plt.imread("stars.jpg")
-# ax.imshow(back, alpha=0.5, extent=(-0.25, 0.5, 0.0, 0.5))
+fig, ax = plt.subplots(1,1, figsize=(15,30))
 
 for i, row in enumerate(np.unique(final_scores['FINAL SCORE'])):
     this_score = final_scores[final_scores['FINAL SCORE'] == row]
@@ -94,5 +91,5 @@ ax.set_title('Final scores after {} rounds'.format(args.maxround))
 
 ax.set_xlim(0.0, 1.0)
 
-pl.savefig('ladder.pdf'.format(args.maxround), transparent=True)
+pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
 
