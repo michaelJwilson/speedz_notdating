@@ -8,29 +8,31 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 
+from   matplotlib.ticker import FormatStrFormatter
+from   matplotlib.ticker import MaxNLocator
 from   matplotlib import rcParams
 from   astropy.table import Table
 
 
-plt.style.use('dark_background')
-
 rcParams['font.family'] = 'Batang'
 rcParams['font.sans-serif'] = ['Batang']
 
-font = {'size': 50}
-matplotlib.rc('font', **font)
+# font = {'size': 50}
+# matplotlib.rc('font', **font)
 
-score_types = ['howmany?!?', 'basics', 'notyourtype', 'lossofconfidence', 'aggorantmuch', 'round_score']
+score_types = ['how many?!?', 'basics', 'not your type?', 'loss of confidence?', 'arrogant much?', 'round score']
 
-root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/'
+# root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/'
+root_dir = '/Users/MJWilson/Downloads/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
 parser.add_argument('--maxround', type=int, default=2)
 
+
 args = parser.parse_args()
 
-rounds = np.arange(args.maxround)
+rounds = np.arange(args.maxround, dtype=np.int)
 
 contestants = {}
 
@@ -58,9 +60,9 @@ for i, contestant in enumerate(contestant_list):
     for rround in rounds:
         for j, ttype in enumerate(score_types):
             if rround in contestants[contestant].keys():
-                ladder[i, rround, j] = contestants[contestant][rround].iloc[j, 1]
+                ladder[i, rround, j] = np.int(contestants[contestant][rround].iloc[j, 1])
 
-ladder = np.cumsum(ladder, axis=1)
+ladder = np.cumsum(ladder, axis=1, dtype=np.int)
 
 final_scores = Table(np.c_[np.array(contestant_list), ladder[:, -1, -1]], names=['ENTRANT', 'FINAL SCORE'])
 final_scores.sort('FINAL SCORE')
@@ -74,29 +76,27 @@ print('\n\n')
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-fig, ax = plt.subplots(1,1, figsize=(15,30))
+fig, ax = plt.subplots(1,6, figsize=(20,5))
 
-# back = plt.imread("stars.jpg")
-# ax.imshow(back, alpha=0.5, extent=(-0.25, 0.5, 0.0, 0.5))
+plt.subplots_adjust(hspace=0.4)
 
-for i, row in enumerate(np.unique(final_scores['FINAL SCORE'])):
-    this_score = final_scores[final_scores['FINAL SCORE'] == row]
+for j, ttype in enumerate(score_types):
+    ax[j].set_title(ttype)
+    
+    for i, contestant in enumerate(contestant_list):
+        ax[j].plot(rounds, ladder[i, :, j], label=contestant)
 
-    ax.axhline(row, xmin=0., xmax=1., c=colors[i], lw=1.0, alpha=0.75)
+    ax[j].xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax[j].yaxis.set_major_locator(MaxNLocator(integer=True))
 
-    if len(this_score) > 1:
-        string = '-'.join([x for x in this_score['ENTRANT']])
-        
-        ax.text(0.5, row, string, verticalalignment='bottom')
-        
-    else:
-        ax.text(0.5, row, this_score['ENTRANT'][0], verticalalignment='bottom')
+    ax[j].set_ylim(-1, np.maximum(5, ax[j].get_ylim()[1]))
+    
+    ax[j].set_xlabel('Round')
+    
+# pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
+ax[-1].legend(frameon=False, ncol=2, bbox_to_anchor=(1.025, 1))
 
-ax.get_xaxis().set_visible(False)
-ax.set_title('Final scores after {} rounds'.format(args.maxround))
+fig.suptitle('Curves of growth', fontsize=15)
 
-ax.set_xlim(0.0, 1.0)
-
-pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
-
+pl.savefig('curve_of_growth.pdf')
 
