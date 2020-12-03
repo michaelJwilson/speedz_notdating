@@ -22,12 +22,14 @@ rcParams['font.sans-serif'] = ['Batang']
 
 score_types = ['how many?!?', 'basics', 'not your type?', 'loss of confidence?', 'arrogant much?', 'round score']
 
-root_dir = '/global/homes/m/mjwilson/speedz_notdating/dryrun/'
+root_dir = '/Users/MJWilson/Work/speedz_notdating/'
+input_dir = '/Users/MJWilson/Work/speedz_notdating/test/'
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
+parser.add_argument('--inputdir', default=input_dir, type=str)
 parser.add_argument('--maxround', type=int, default=2)
-
 
 args = parser.parse_args()
 
@@ -36,9 +38,11 @@ rounds = np.arange(args.maxround, dtype=np.int)
 contestants = {}
 
 for rround in rounds:
-    scores_dir = args.rootdir + '/scores/{:d}/'.format(rround)
+    scores_dir = args.inputdir + '/scores/{:d}/'.format(rround)
     scores     = glob.glob(scores_dir + '/*.json')
 
+    print('Reducing {}'.format(scores_dir))
+    
     if len(scores) == 0:
         raise ValueError('No entries in {}.'.format(scores_dir))
     
@@ -48,8 +52,8 @@ for rround in rounds:
         if author not in contestants.keys():
             contestants[author] = {}        
         
-            score = pd.read_csv(score, sep='\s+', names=['type', 'score'])
-            contestants[author][rround] = score
+        score = pd.read_csv(score, sep='\s+', names=['type', 'score'])
+        contestants[author][rround] = score
 
 contestant_list = list(contestants.keys())
             
@@ -63,7 +67,7 @@ for i, contestant in enumerate(contestant_list):
 
 ladder = np.cumsum(ladder, axis=1, dtype=np.int)
 
-final_scores = Table(np.c_[np.array(contestant_list), ladder[:, -1, -1]], names=['ENTRANT', 'FINAL SCORE'])
+final_scores = Table(np.c_[np.array(contestant_list), ladder[:, -1, -1]], names=['ENTRANT', 'FINAL SCORE'], dtype=[np.str, np.int])
 final_scores.sort('FINAL SCORE')
 final_scores.reverse()
 
@@ -88,8 +92,7 @@ for j, ttype in enumerate(score_types):
     ax[j].xaxis.set_major_locator(MaxNLocator(integer=True))
     ax[j].yaxis.set_major_locator(MaxNLocator(integer=True))
 
-    ax[j].set_ylim(-1, np.maximum(5, ax[j].get_ylim()[1]))
-    
+    # ax[j].set_ylim(-1, np.maximum(5, ax[j].get_ylim()[1]))
     ax[j].set_xlabel('Round')
 
 print(ladder)
