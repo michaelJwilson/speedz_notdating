@@ -22,8 +22,7 @@ rcParams['font.sans-serif'] = ['Batang']
 
 score_types = ['how many?!?', 'basics', 'not your type?', 'loss of confidence?', 'arrogant much?', 'round score']
 
-# root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/'
-root_dir = '/Users/MJWilson/Downloads/'
+root_dir = '/global/homes/m/mjwilson/speedz_notdating/dryrun/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
@@ -92,6 +91,8 @@ for j, ttype in enumerate(score_types):
     ax[j].set_ylim(-1, np.maximum(5, ax[j].get_ylim()[1]))
     
     ax[j].set_xlabel('Round')
+
+print(ladder)
     
 # pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
 ax[-1].legend(frameon=False, ncol=2, bbox_to_anchor=(1.025, 1))
