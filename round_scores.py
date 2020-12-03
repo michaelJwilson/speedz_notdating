@@ -26,9 +26,13 @@ truth_qsos  = Table.read('/global/cfs/cdirs/desi/sv/vi/TruthTables/truth_table_Q
 truth_lrgs  = Table.read('/global/cfs/cdirs/desi/sv/vi/TruthTables/truth_table_LRG_v1.2.csv')[columns]
 truth_elgs  = Table.read('/global/cfs/cdirs/desi/sv/vi/TruthTables/truth_table_ELG_v1.2.csv')[columns]
 truth_bgs   = Table.read('/global/cfs/cdirs/desi/sv/vi/TruthTables/truth_table_BGS_v1.2.csv')[columns]
+truth_bbgs  = Table.read('/global/cfs/cdirs/desi/sv/vi/TruthTables/Andes_reinspection/BGS/Truth_table_Andes_reinspection_BGS_70500_20200303_v1.csv')
 
-truth       = vstack((truth_qsos, truth_lrgs, truth_elgs, truth_bgs))
+truth       = vstack((truth_qsos, truth_lrgs, truth_elgs, truth_bgs, truth_bbgs))
 truth.sort('TARGETID')
+
+# uids, cnts  = np.unique(truth['TARGETID'], return_counts=True) 
+# assert  cnts.max() == 1
 
 ## truth.pprint(max_width=-1)  
 
