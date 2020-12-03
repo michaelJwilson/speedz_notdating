@@ -13,7 +13,7 @@ root_dir=os.environ['CSCRATCH'] + '/speedz_notdating/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
-parser.add_argument('--maxround', type=int, default=2)
+parser.add_argument('--maxround', type=int, default=10)
 parser.add_argument('--specperround', type=np.int, default=100)
 
 args = parser.parse_args()

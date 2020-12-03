@@ -17,13 +17,14 @@ from   pathlib import Path
 from   astropy.io import ascii
 from   astropy.table import Table
 
+
 np.random.seed(42)
 
 root_dir=os.environ['CSCRATCH'] + '/speedz_notdating/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
-parser.add_argument('--maxround', type=int, default=2)
+parser.add_argument('--maxround', type=int, default=10)
 
 args = parser.parse_args()
 
@@ -40,7 +41,7 @@ for rround in rounds:
     Path(WEB_DIR).mkdir(parents=True, exist_ok=True)
 
     # --tiles {} --nights {} TILES, NIGHTS
-    cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --with_multiple_models --titlepage_prefix={}'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TITLEPAGE)
+    cmd='run_specview_cmx_targets --specprod_dir={} --webdir={} --target_list={} --with_multiple_models --titlepage_prefix={} --nspecperfile 25 --countdown=10'.format(SPECPROD_DIR, WEB_DIR, TARGET_LIST, TITLEPAGE)
 
     os.system(cmd)
 
