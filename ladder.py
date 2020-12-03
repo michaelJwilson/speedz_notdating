@@ -79,9 +79,6 @@ colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 fig, ax = plt.subplots(1,1, figsize=(15,30))
 
-# back = plt.imread("stars.jpg")
-# ax.imshow(back, alpha=0.5, extent=(-0.25, 0.5, 0.0, 0.5))
-
 for i, row in enumerate(np.unique(final_scores['FINAL SCORE'])):
     this_score = final_scores[final_scores['FINAL SCORE'] == row]
 
@@ -101,5 +98,3 @@ ax.set_title('Final scores after {} rounds'.format(args.maxround))
 ax.set_xlim(0.0, 1.0)
 
 pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
-
-
