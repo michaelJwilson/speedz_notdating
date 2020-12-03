@@ -182,9 +182,9 @@ for author in toloop:
     
     fig, ax = plt.subplots(figsize=(7.5, 7.5))
 
-    ax.pie(sizes, labels=plabels, autopct='%1.1f%%', shadow=True, startangle=90, explode=explode, colors=colors, rotatelabels=True, wedgeprops={'alpha': 0.5})
+    ax.pie(sizes, labels=plabels, autopct='%1.1f%%', shadow=True, startangle=145, explode=explode, colors=colors, rotatelabels=True, wedgeprops={'alpha': 0.5})
 
-    ax.set_title(author)
+    ax.set_title('Round {}: {}'.format(args.round, author))
 
     ax.axis('equal')
 
