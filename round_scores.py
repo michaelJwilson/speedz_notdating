@@ -3,9 +3,13 @@ import glob
 import json
 import argparse
 import numpy  as np
+import pylab as pl
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from   astropy.table import Table, join, vstack, Row
+from   pathlib import Path
+
 
 # [dryrun, test]
 root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/test/'
@@ -95,6 +99,13 @@ dz   = 300. / 2.9979e5
 atol = 3. * dz
 atol = 1.e-2
 
+
+labels = ['basics_pos', 'basics_neg', 'basics_miss', 'notyourtype', 'lossofconfidence', 'arrogantmuch']
+plabels = ['Basics +', 'Basics -', 'Basics miss', 'Not your type?', 'Loss of confidence?', 'Arrogant much?']
+
+# colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+colors = pl.cm.viridis(np.linspace(0, 1, len(labels)))
+
 for author in toloop:
     merge = join(contestants[author]['all_entries'], truth['TARGETID', 'best z', 'best quality', 'best spectype'], join_type='left', keys='TARGETID')
     
@@ -162,6 +173,27 @@ for author in toloop:
 
     f.close()
 
+    # basics_pos basics_neg basics_miss basics notyourtype lossofconfidence arrogantmuch
+    
+    sizes = np.array([np.count_nonzero(merge[x]) for x in labels])
+
+    explode = np.array([0.0] * len(sizes))
+    explode[sizes == sizes.max()] = 0.1
+    
+    fig, ax = plt.subplots(figsize=(7.5, 7.5))
+
+    ax.pie(sizes, labels=plabels, autopct='%1.1f%%', shadow=True, startangle=90, explode=explode, colors=colors, rotatelabels=True, wedgeprops={'alpha': 0.5})
+
+    ax.set_title(author)
+
+    ax.axis('equal')
+
+    Path(args.rootdir + '/scores/{:d}/plots/'.format(args.round)).mkdir(parents=True, exist_ok=True)
+
+    plt.tight_layout()
+    
+    pl.savefig(args.rootdir + '/scores/{:d}/plots/{}.pdf'.format(args.round, author))
+    
 print('\n\nScores generated at {}.'.format(args.rootdir + '/scores/{:d}/'.format(args.round)))
     
 print('\n\nDone.\n\n')
