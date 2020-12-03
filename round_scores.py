@@ -13,8 +13,11 @@ root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/test/'
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
 parser.add_argument('--round', type=int, default=0)
+parser.add_argument('--idcheck', type=int, default=0)
 
 args = parser.parse_args()
+
+round_ids   = Table.read(os.environ['CSCRATCH'] + '/speedz_notdating/prospects/{:d}/targetids.csv'.format(args.round))['# TARGETID'].data
 
 # 'merger comment', 'all VI issues', 'all VI comments'
 columns     = ['TARGETID', 'Redrock z', 'best z', 'best quality', 'Redrock spectype', 'best spectype', 'N_VI', 'DELTACHI2', 'ZWARN']
@@ -72,6 +75,9 @@ for x in entries:
 
     except:
         print('Failure for {}'.format(x))
+
+    if args.idcheck:
+        assert  np.all(np.isin(entry['TARGETID'].data, round_ids))
         
 print('\n\n')        
 print(contestants.keys())
