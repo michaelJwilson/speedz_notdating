@@ -11,12 +11,12 @@ from   astropy.table import Table, join, vstack, Row
 from   pathlib import Path
 
 
-# [dryrun, test]
+# [dryrun, test], e.g. /global/cscratch1/sd/mjwilson/speedz_notdating/dryrun/entries/0/
 root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/test/'
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--rootdir', default=root_dir, type=str)
-parser.add_argument('--round', type=int, default=0)
+parser.add_argument('--rootdir', required=True, type=str)
+parser.add_argument('--round', type=int, required=True)
 parser.add_argument('--idcheck', type=int, default=0)
 
 args = parser.parse_args()
