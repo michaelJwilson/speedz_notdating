@@ -20,7 +20,7 @@ rcParams['font.sans-serif'] = ['Batang']
 # font = {'size': 50}
 # matplotlib.rc('font', **font)
 
-score_types = ['how many?!?', 'basics', 'not your type?', 'loss of confidence?', 'arrogant much?', 'round score']
+score_types = ['How many?!?', 'Basics', 'Not your type?', 'Loss of confidence?', 'Arrogant much?', 'Round score']
 
 root_dir = '/Users/MJWilson/Work/speedz_notdating/'
 
@@ -32,7 +32,7 @@ parser.add_argument('--maxround', type=int, required=True)
 
 args = parser.parse_args()
 
-assert  (args.maxround >= 2)
+# assert  (args.maxround >= 2)
 
 rounds = np.arange(args.maxround, dtype=np.int)
 
@@ -43,10 +43,10 @@ for rround in rounds:
     scores     = glob.glob(scores_dir + '/*.json')
 
     print('Reducing {}'.format(scores_dir))
-    
+    '''
     if len(scores) == 0:
         raise ValueError('No entries in {}.'.format(scores_dir))
-    
+    '''
     for score in scores:
         author = score.split('/')[-1].split('.')[0]
 
@@ -99,7 +99,9 @@ for j, ttype in enumerate(score_types):
 # pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
 ax[-1].legend(frameon=False, ncol=2, bbox_to_anchor=(1.025, 1))
 
+ax[-1].set_yscale('log')
+
 fig.suptitle('Curves of growth', fontsize=15)
 
-pl.savefig('curve_of_growth_{:d}.pdf'.format(args.maxround))
+pl.savefig('curve_of_growth_{:d}.png'.format(args.maxround))
 

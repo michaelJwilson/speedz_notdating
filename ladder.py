@@ -23,7 +23,9 @@ matplotlib.rc('font', **font)
 score_types = ['howmany?!?', 'basics', 'notyourtype', 'lossofconfidence', 'aggorantmuch', 'round_score']
 
 root_dir = '/Users/MJWilson/Work/speedz_notdating/'
-input_dir = '/Users/MJWilson/Work/speedz_notdating/test/'
+input_dir = '/Users/MJWilson/Work/speedz_notdating/ecs/'
+
+print(input_dir)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
@@ -84,16 +86,21 @@ fig, ax = plt.subplots(1,1, figsize=(15,30))
 for i, row in enumerate(np.unique(final_scores['FINAL SCORE'])):
     this_score = final_scores[final_scores['FINAL SCORE'] == row]
 
-    ax.axhline(row, xmin=0., xmax=1., c=colors[i], lw=1.0, alpha=0.75)
+    # c=colors[i]
+    ax.axhline(row, xmin=0., xmax=1., lw=1.0, alpha=0.75)
 
     if len(this_score) > 1:
         string = '-'.join([x for x in this_score['ENTRANT']])
         
-        ax.text(0.5, row, string, verticalalignment='bottom')
+        ax.text(0.3, row, string, verticalalignment='bottom')
         
     else:
-        ax.text(0.5, row, this_score['ENTRANT'][0], verticalalignment='bottom')
+        pos = 0.2 + np.fmod(0.2 * i, 0.6)
+        
+        ax.text(pos, row, this_score['ENTRANT'][0], verticalalignment='bottom')
 
+ax.set_yscale('log')
+        
 ax.get_xaxis().set_visible(False)
 ax.set_title('Final scores after {} rounds'.format(args.maxround))
 
