@@ -23,15 +23,16 @@ rcParams['font.sans-serif'] = ['Batang']
 score_types = ['how many?!?', 'basics', 'not your type?', 'loss of confidence?', 'arrogant much?', 'round score']
 
 root_dir = '/Users/MJWilson/Work/speedz_notdating/'
-input_dir = '/Users/MJWilson/Work/speedz_notdating/test/'
 
-
+# '/Users/MJWilson/Work/speedz_notdating/test/'
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
-parser.add_argument('--inputdir', default=input_dir, type=str)
-parser.add_argument('--maxround', type=int, default=2)
+parser.add_argument('--inputdir', required=True, type=str)
+parser.add_argument('--maxround', type=int, required=True)
 
 args = parser.parse_args()
+
+assert  (args.maxround >= 2)
 
 rounds = np.arange(args.maxround, dtype=np.int)
 
@@ -94,13 +95,11 @@ for j, ttype in enumerate(score_types):
 
     # ax[j].set_ylim(-1, np.maximum(5, ax[j].get_ylim()[1]))
     ax[j].set_xlabel('Round')
-
-print(ladder)
     
 # pl.savefig('ladder_{:d}.pdf'.format(args.maxround), transparent=True)
 ax[-1].legend(frameon=False, ncol=2, bbox_to_anchor=(1.025, 1))
 
 fig.suptitle('Curves of growth', fontsize=15)
 
-pl.savefig('curve_of_growth.pdf')
+pl.savefig('curve_of_growth_{:d}.pdf'.format(args.maxround))
 

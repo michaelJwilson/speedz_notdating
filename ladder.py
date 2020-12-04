@@ -27,8 +27,8 @@ input_dir = '/Users/MJWilson/Work/speedz_notdating/test/'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rootdir', default=root_dir, type=str)
-parser.add_argument('--inputdir', default=input_dir, type=str)
-parser.add_argument('--maxround', type=int, default=2)
+parser.add_argument('--inputdir', required=True, type=str)
+parser.add_argument('--maxround', type=int, required=True)
 
 args = parser.parse_args()
 
@@ -74,6 +74,8 @@ print('\n\n')
 final_scores.pprint()
 
 print('\n\n')
+
+final_scores.write('finalscores_{:d}.fits'.format(args.maxround), format='fits', overwrite=True)
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
