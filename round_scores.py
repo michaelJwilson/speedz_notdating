@@ -12,10 +12,12 @@ from   pathlib import Path
 
 
 # [dryrun, test], e.g. /global/cscratch1/sd/mjwilson/speedz_notdating/dryrun/entries/0/
-root_dir = os.environ['CSCRATCH'] + '/speedz_notdating/test/'
+input_dir = os.environ['CSCRATCH'] + '/speedz_notdating/ecs/'
+
+print(input_dir)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--rootdir', required=True, type=str)
+parser.add_argument('--inputdir', required=True, type=str)
 parser.add_argument('--round', type=int, required=True)
 parser.add_argument('--idcheck', type=int, default=0)
 
@@ -41,7 +43,7 @@ truth.sort('TARGETID')
 ## truth.pprint(max_width=-1)  
 
 ##
-entries_dir = args.rootdir + '/entries/{:d}/'.format(args.round)
+entries_dir = args.inputdir + '/entries/{:d}/'.format(args.round)
 entries     = glob.glob(entries_dir + '/*.csv')
 
 round_table = Table() # pd.read_csv(entries[0])
@@ -59,17 +61,25 @@ for x in entries:
         entry_num   = np.int(x.split('_')[-2])
     
         # TARGETID EXPID NIGHT TILEID Spec_version Redrock_version Template_version Redrock_spectype Redrock_z VI_scanner VI_quality VI_issue VI_z VI_spectype VI_comment 
-        entry       = pd.read_csv(x)
-        entry       = entry.sort_values(by=['TARGETID'])
+        # entry     = pd.read_csv(x)
+        # entry     = entry.sort_values(by=['TARGETID'])
 
-        entry_columns = list(entry.columns)
-    
-        entry       = Table(entry.to_numpy(), names=entry_columns)
+        entry       = Table.read(x)
+        entry.sort('TARGETID')
+
+        print(entry)
+        
+        # entry_columns = list(entry.columns)
+        # entry       = Table(entry.to_numpy(), names=entry_columns)
+
         entry['TARGETID'] = np.array(entry['TARGETID'], dtype=np.int64)
         entry['VI_z'] = np.array(entry['VI_z'], dtype=np.float64)
         entry['VI_spectype'] = np.array(entry['VI_spectype'].data, dtype=np.str)
         entry['ENTRY_NUM'] = entry_num
         entry['Redrock_z'] = np.array(entry['Redrock_z'], dtype=np.float64)
+
+        del entry['VI_issue']
+        del entry['VI_comment']
         
         if author not in contestants:
             contestants[author] = {'entry_0': entry, 'all_entries': entry, 'nentry': 1}
@@ -81,9 +91,11 @@ for x in entries:
             
         round_table = vstack((round_table, entry)) # round_table.append(entry)
 
-    except:
+    except Exception as e:
         print('Failure for {}'.format(x))
 
+        print(e)
+        
     if args.idcheck:
         assert  np.all(np.isin(entry['TARGETID'].data, round_ids))
         
@@ -100,11 +112,13 @@ atol = 3. * dz
 atol = 1.e-2
 
 
-labels = ['basics_pos', 'basics_neg', 'basics_miss', 'notyourtype', 'lossofconfidence', 'arrogantmuch']
-plabels = ['Basics +', 'Basics -', 'Basics miss', 'Not your type?', 'Loss of confidence?', 'Arrogant much?']
+labels   = ['basics_pos', 'basics_neg', 'basics_miss', 'notyourtype',    'lossofconfidence',    'arrogantmuch']
+plabels  = ['How many?!?', 'Basics +',   'Basics -',   'Basics miss', 'Not your type?', 'Loss of confidence?', 'Arrogant much?']
+
+plabels = np.array(plabels)
 
 # colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-colors = pl.cm.viridis(np.linspace(0, 1, len(labels)))
+colors = pl.cm.tab20c(np.linspace(0, 1, len(labels)))
 
 for author in toloop:
     merge = join(contestants[author]['all_entries'], truth['TARGETID', 'best z', 'best quality', 'best spectype'], join_type='left', keys='TARGETID')
@@ -162,7 +176,13 @@ for author in toloop:
     
     scores.pprint()
 
-    output_path = args.rootdir + '/scores/{:d}/{}.json'.format(args.round, author)
+    Path(args.inputdir + '/scores/{:d}/merge/'.format(args.round)).mkdir(parents=True, exist_ok=True)
+
+    output_path = args.inputdir + '/scores/{:d}/merge/{}.fits'.format(args.round, author)
+
+    merge.write(output_path, format='fits', overwrite=True)
+    
+    output_path = args.inputdir + '/scores/{:d}/{}.json'.format(args.round, author)
 
     towrite = list(scores.dtype.names)
     
@@ -173,27 +193,28 @@ for author in toloop:
 
     f.close()
 
-    # basics_pos basics_neg basics_miss basics notyourtype lossofconfidence arrogantmuch
+    # basics_pos basics_neg basics_miss basics notyourtype lossofconfidence arrogantmuch    
+    sizes  = [scores['howmany?!?'][0]] + [np.count_nonzero(merge[x]) for x in labels]
+    sizes  = np.array(sizes)
     
-    sizes = np.array([np.count_nonzero(merge[x]) for x in labels])
-
     explode = np.array([0.0] * len(sizes))
-    explode[sizes == sizes.max()] = 0.1
+
+    pl.clf()
     
-    fig, ax = plt.subplots(figsize=(7.5, 7.5))
+    fig, ax  = plt.subplots(figsize=(7.5, 7.5))
 
-    ax.pie(sizes, labels=plabels, autopct='%1.1f%%', shadow=True, startangle=145, explode=explode, colors=colors, rotatelabels=True, wedgeprops={'alpha': 0.5})
-
+    size     = 0.3
+    
+    ax.pie(sizes, labels=plabels, autopct='%1.1f%%', shadow=False, startangle=145, explode=explode, colors=colors, rotatelabels=True, wedgeprops={'alpha': 0.5, 'width': size, 'edgecolor': 'w'}, radius=1, textprops={'fontsize': 7})
+    
     ax.set_title('Round {}: {}'.format(args.round, author))
 
     ax.axis('equal')
 
-    Path(args.rootdir + '/scores/{:d}/plots/'.format(args.round)).mkdir(parents=True, exist_ok=True)
-
-    plt.tight_layout()
+    Path(args.inputdir + '/scores/{:d}/plots/'.format(args.round)).mkdir(parents=True, exist_ok=True)
     
-    pl.savefig(args.rootdir + '/scores/{:d}/plots/{}.pdf'.format(args.round, author))
+    fig.savefig(args.inputdir + '/scores/{:d}/plots/{}.png'.format(args.round, author))
     
-print('\n\nScores generated at {}.'.format(args.rootdir + '/scores/{:d}/'.format(args.round)))
+print('\n\nScores generated at {}.'.format(args.inputdir + '/scores/{:d}/'.format(args.round)))
     
 print('\n\nDone.\n\n')
